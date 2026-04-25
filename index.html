@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Carousel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-background: #fff3f5;
+      --color-brown: #2b1812;
+      --color-white: #ffffff;
+      --color-shadow: rgba(0, 0, 0, 0.18);
+
+      background: var(--color-background);
+      color: var(--color-brown);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .carousel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .viewer {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto minmax(0, max-content) auto;
+      grid-template-areas: "prev image next";
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .frame {
+      width: fit-content;
+      max-width: 100%;
+      grid-area: image;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 18px 50px var(--color-shadow);
+    }
+
+    .slide {
+      max-width: min(calc(100vw - 200px), 900px);
+      max-height: 78vh;
+      display: block;
+      cursor: pointer;
+    }
+
+    .nav {
+      width: 58px;
+      height: 58px;
+      border: 2px solid var(--color-brown);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      background: var(--color-white);
+      color: var(--color-brown);
+      box-shadow: 0 8px 24px var(--color-shadow);
+    }
+
+    .nav::before {
+      content: "";
+      width: 15px;
+      height: 15px;
+      border-top: 4px solid currentColor;
+      border-right: 4px solid currentColor;
+    }
+
+    .prev {
+      grid-area: prev;
+    }
+
+    .prev::before {
+      transform: translateX(3px) rotate(-135deg);
+    }
+
+    .next {
+      grid-area: next;
+    }
+
+    .next::before {
+      transform: translateX(-3px) rotate(45deg);
+    }
+
+    .nav:hover,
+    .nav:focus-visible {
+      background: var(--color-brown);
+      color: var(--color-white);
+      outline: none;
+    }
+
+    .caption {
+      width: min(900px, 100%);
+      margin: 18px 0 0;
+      padding: 0 12px;
+      text-align: center;
+      font-family: "Cormorant Garamond", Georgia, "Palatino Linotype", Palatino, "Book Antiqua", serif;
+      font-size: 24px;
+      font-style: italic;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .caption a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+    }
+
+    .caption a:hover,
+    .caption a:focus-visible {
+      text-decoration-thickness: 2px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+      }
+
+      .frame {
+        border-radius: 6px;
+      }
+
+      .viewer {
+        grid-template-columns: auto auto;
+        grid-template-areas:
+          "image image"
+          "prev next";
+        row-gap: 14px;
+        column-gap: 12px;
+      }
+
+      .prev {
+        justify-self: end;
+      }
+
+      .next {
+        justify-self: start;
+      }
+
+      .nav {
+        width: 52px;
+        height: 52px;
+      }
+
+      .nav::before {
+        width: 13px;
+        height: 13px;
+      }
+
+      .slide {
+        max-width: calc(100vw - 28px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="carousel" aria-label="Image carousel">
+    <div class="viewer">
+      <button class="nav prev" type="button" aria-label="Previous image"></button>
+      <div class="frame">
+        <img class="slide" alt="" title="Next image" hidden>
+      </div>
+      <button class="nav next" type="button" aria-label="Next image"></button>
+    </div>
+    <p class="caption" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const seanMondoutUrl = "https://www.facebook.com/groups/124401747655527/posts/3889234391172225/";
+    const images = [
+      {
+        file: "images/peery-1974.jpg",
+        description_lines: ["William W. Peery, 1974"],
+        description_url: "https://digital.denverlibrary.org/nodes/view/1017980",
+      },
+      {
+        file: "images/moss-1951.jpg",
+        description_lines: ["Elmer Moss, 1951"],
+        description_url: "https://digital.denverlibrary.org/nodes/view/1017983",
+      },
+      {
+        file: "images/ghylon-haack-sketch.jpg",
+        description_lines: [
+          "Sketch by Wayne Ghylon 1969, watercolored by Laurel Haack in 1980",
+          "per Sean Mondout on Facebook",
+        ],
+        description_url: seanMondoutUrl,
+      },
+      {
+        file: "images/james-kramer.jpg",
+        description_lines: [
+          "Painting by James Kramer",
+        ],
+        description_url: "https://www.santafeartauction.com/auction-lot/james-kramer-maxwell-house-georgetown-colorado_63fea1362d",
+      },
+      {
+        file: "images/bilsten-postcard.jpg",
+        description_lines: [
+          "From postcard by Art Bilsten",
+          "per Sean Mondout on Facebook",
+        ],
+        description_url: seanMondoutUrl,
+      },
+      {
+        file: "images/debbie-patrick-cross-stitch.jpg",
+        description_lines: ["Cross Stitch by Debbie Patrick"],
+      },
+      {
+        file: "images/modern-postcard.jpg",
+        description_lines: ["Postcard", "per Sean Mondout on Facebook"],
+        description_url: seanMondoutUrl,
+      },
+    ];
+
+    const slide = document.querySelector(".slide");
+    const caption = document.querySelector(".caption");
+    const prevButton = document.querySelector(".prev");
+    const nextButton = document.querySelector(".next");
+    let currentIndex = 0;
+
+    function descriptionLines(image) {
+      if (image.description_lines?.length) return image.description_lines;
+      if (image.description) return [image.description];
+
+      const filename = image.file.split("/").pop() || image.file;
+      return [filename.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ")];
+    }
+
+    function imageLabel(image) {
+      return descriptionLines(image).join(" ");
+    }
+
+    function descriptionUrl(image) {
+      return image.description_url || image.decription_url;
+    }
+
+    function appendDescriptionLines(container, lines) {
+      lines.forEach((line, index) => {
+        if (index > 0) container.append(document.createElement("br"));
+        container.append(document.createTextNode(line));
+      });
+    }
+
+    function renderCaption(image) {
+      caption.replaceChildren();
+      const lines = descriptionLines(image);
+      const url = descriptionUrl(image);
+
+      if (!url) {
+        appendDescriptionLines(caption, lines);
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      appendDescriptionLines(link, lines);
+      caption.append(link);
+    }
+
+    function showSlide(index) {
+      if (!images.length) {
+        slide.hidden = true;
+        caption.textContent = "";
+        prevButton.hidden = true;
+        nextButton.hidden = true;
+        return;
+      }
+
+      currentIndex = (index + images.length) % images.length;
+      const image = images[currentIndex];
+      slide.src = image.file;
+      slide.alt = imageLabel(image);
+      slide.hidden = false;
+      renderCaption(image);
+      prevButton.hidden = images.length < 2;
+      nextButton.hidden = images.length < 2;
+    }
+
+    prevButton.addEventListener("click", () => showSlide(currentIndex - 1));
+    nextButton.addEventListener("click", () => showSlide(currentIndex + 1));
+    slide.addEventListener("click", () => showSlide(currentIndex + 1));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") showSlide(currentIndex - 1);
+      if (event.key === "ArrowRight") showSlide(currentIndex + 1);
+    });
+
+    showSlide(0);
+  </script>
+</body>
+</html>
