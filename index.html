@@ -278,6 +278,13 @@
       caption.append(link);
     }
 
+    function preloadImages() {
+      images.forEach((image) => {
+        const preload = new Image();
+        preload.src = image.file;
+      });
+    }
+
     function showSlide(index) {
       if (!images.length) {
         slide.hidden = true;
@@ -307,6 +314,7 @@
     });
 
     showSlide(0);
+    preloadImages();
   </script>
 </body>
 </html>
