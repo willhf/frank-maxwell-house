@@ -59,6 +59,7 @@
     }
 
     .frame {
+      position: relative;
       width: fit-content;
       max-width: 100%;
       grid-area: image;
@@ -72,6 +73,13 @@
       max-height: 78vh;
       display: block;
       cursor: pointer;
+    }
+
+    .slide:not(.active) {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .nav {
@@ -111,11 +119,22 @@
       transform: translateX(-3px) rotate(45deg);
     }
 
-    .nav:hover,
+    .nav:hover {
+      background: var(--color-brown);
+      color: var(--color-white);
+    }
+
     .nav:focus-visible {
       background: var(--color-brown);
       color: var(--color-white);
       outline: none;
+    }
+
+    @media (hover: none) {
+      .nav:hover {
+        background: var(--color-white);
+        color: var(--color-brown);
+      }
     }
 
     .caption {
@@ -187,9 +206,7 @@
   <main class="carousel" aria-label="Image carousel">
     <div class="viewer">
       <button class="nav prev" type="button" aria-label="Previous image"></button>
-      <div class="frame">
-        <img class="slide" alt="" title="Next image" hidden>
-      </div>
+      <div class="frame"></div>
       <button class="nav next" type="button" aria-label="Next image"></button>
     </div>
     <p class="caption" aria-live="polite"></p>
@@ -242,10 +259,11 @@
       },
     ];
 
-    const slide = document.querySelector(".slide");
+    const frame = document.querySelector(".frame");
     const caption = document.querySelector(".caption");
     const prevButton = document.querySelector(".prev");
     const nextButton = document.querySelector(".next");
+    const slides = [];
     let currentIndex = 0;
 
     function descriptionLines(image) {
@@ -260,10 +278,6 @@
       return descriptionLines(image).join(" ");
     }
 
-    function descriptionUrl(image) {
-      return image.description_url || image.decription_url;
-    }
-
     function appendDescriptionLines(container, lines) {
       lines.forEach((line, index) => {
         if (index > 0) container.append(document.createElement("br"));
@@ -274,7 +288,7 @@
     function renderCaption(image) {
       caption.replaceChildren();
       const lines = descriptionLines(image);
-      const url = descriptionUrl(image);
+      const url = image.description_url;
 
       if (!url) {
         appendDescriptionLines(caption, lines);
@@ -289,16 +303,27 @@
       caption.append(link);
     }
 
-    function preloadImages() {
-      images.forEach((image) => {
-        const preload = new Image();
-        preload.src = image.file;
+    function renderSlides() {
+      images.forEach((image, index) => {
+        const slide = document.createElement("img");
+        slide.className = "slide";
+        slide.src = image.file;
+        slide.alt = imageLabel(image);
+        slide.title = "Next image";
+        slide.decoding = "async";
+        frame.append(slide);
+        slides[index] = slide;
+      });
+    }
+
+    function decodeSlides() {
+      slides.forEach((slide) => {
+        if (slide.decode) slide.decode().catch(() => {});
       });
     }
 
     function showSlide(index) {
       if (!images.length) {
-        slide.hidden = true;
         caption.textContent = "";
         prevButton.hidden = true;
         nextButton.hidden = true;
@@ -307,9 +332,9 @@
 
       currentIndex = (index + images.length) % images.length;
       const image = images[currentIndex];
-      slide.src = image.file;
-      slide.alt = imageLabel(image);
-      slide.hidden = false;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === currentIndex);
+      });
       renderCaption(image);
       prevButton.hidden = images.length < 2;
       nextButton.hidden = images.length < 2;
@@ -317,15 +342,16 @@
 
     prevButton.addEventListener("click", () => showSlide(currentIndex - 1));
     nextButton.addEventListener("click", () => showSlide(currentIndex + 1));
-    slide.addEventListener("click", () => showSlide(currentIndex + 1));
+    frame.addEventListener("click", () => showSlide(currentIndex + 1));
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft") showSlide(currentIndex - 1);
       if (event.key === "ArrowRight") showSlide(currentIndex + 1);
     });
 
+    renderSlides();
     showSlide(0);
-    preloadImages();
+    decodeSlides();
   </script>
 </body>
 </html>
